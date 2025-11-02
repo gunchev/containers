@@ -1,0 +1,14 @@
+/.idea
+/dist
+/gwebu-profile.spec
+
+*.bak
+*.old
+*.rpmnew
+*.rpmsave
+*~
+.DS_Store*
+.~lock*
+Icon?
+Thumbs.db
+ehthumbs.db
