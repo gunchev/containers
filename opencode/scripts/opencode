@@ -8,6 +8,7 @@ mkdir -p "$HOME/.local/share/opencode" "$HOME/.config/opencode"
 CONTAINER_CMD=$(if command -v podman >/dev/null 2>&1; then echo "podman"; else echo "docker"; fi)
 
 exec "${CONTAINER_CMD}" run \
+        --network=host \
         -v "${PWD}:${PWD}" \
         -v "${HOME}/.config/opencode:/root/.config/opencode" \
         -v "${HOME}/.local/share/opencode:/root/.local/share/opencode" \
