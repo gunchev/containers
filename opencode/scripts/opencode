@@ -12,4 +12,4 @@ exec "${CONTAINER_CMD}" run \
         -v "${HOME}/.config/opencode:/root/.config/opencode" \
         -v "${HOME}/.local/share/opencode:/root/.local/share/opencode" \
     --workdir "$PWD" \
-    --rm -it opencode "$@"
+    --rm -it opencode opencode "$@"
