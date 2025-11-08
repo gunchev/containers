@@ -12,5 +12,6 @@ exec "${CONTAINER_CMD}" run \
         -v "${PWD}:${PWD}" \
         -v "${HOME}/.config/opencode:/root/.config/opencode" \
         -v "${HOME}/.local/share/opencode:/root/.local/share/opencode" \
+        -e TERM \
     --workdir "$PWD" \
     --rm -it opencode opencode "$@"
