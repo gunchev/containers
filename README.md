@@ -7,6 +7,7 @@ You can use any, but use Podman with a non-root user.
 
 ## Images
 
+- [Ollama](https://ollama.com/) | Chat & build with open models.
 - [OpenCode](https://opencode.ai/) | The AI coding agent built for the terminal.
 
 

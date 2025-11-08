@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+shopt -s nullglob dotglob
+
+# In addition to localhost/ollama:latest ubuntu also works
+exec podman run -it --rm \
+    --network=host \
+    --device nvidia.com/gpu=all \
+    --security-opt=label=disable \
+    -v "${HOME}/.ollama:/root/.ollama" \
+    -e TERM \
+    \
+    localhost/ollama:latest \
+    \
+    nvidia-smi -L
