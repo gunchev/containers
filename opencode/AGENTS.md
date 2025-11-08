@@ -6,6 +6,7 @@
 - `make help`: Show available targets
 
 ## Code Style Guidelines
+- Text Files: Always add trailing new line in all text files as defined in the [POSIX standard](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206).
 - Indentation: 4 spaces (Python/C/C++/shell), 2 spaces (JS/JSON/HTML/YAML), tabs (Makefile/Go)
 - Max line length: 120 characters
 - UTF-8 encoding with LF line endings, trim trailing whitespace
