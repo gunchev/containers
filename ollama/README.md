@@ -72,6 +72,8 @@ This runs a quick test to verify NVIDIA GPU access in the container.
 
 ## Development
 
+Text Files should end with  trailing new line as defined in the [POSIX standard](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206).
+
 
 ### Build Commands
 
