@@ -3,8 +3,11 @@
 set -euo pipefail
 shopt -s nullglob dotglob
 
+CONTAINER_CMD=$(if command -v podman >/dev/null 2>&1; then echo "podman"; else echo "docker"; fi)
+
+
 # In addition to localhost/ollama:latest ubuntu also works
-exec podman run -it --rm \
+exec "${CONTAINER_CMD}" run -it --rm \
     --network=host \
     --device nvidia.com/gpu=all \
     --security-opt=label=disable \
