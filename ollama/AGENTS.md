@@ -3,7 +3,8 @@
 ## Build Commands
 - `make image` or `make all`: Build the ollama container image
 - `make clean`: Remove generated images
-- `make image TAG=custom`: Build with custom tag
+- `make image VERSION=x.y.z`: Build specific ollama version
+- `make help`: Show available targets and usage
 
 ## Testing
 - `./scripts/ollama_test_nvidia_gpu`: Test NVIDIA GPU access (single test)
