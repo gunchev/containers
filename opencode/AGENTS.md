@@ -17,5 +17,9 @@
 - Bash: Use `set -euo pipefail`, quote variables, prefer `[[ ]]` over `[ ]`
 
 ## Project Structure
-ArchLinux-based container project with OpenCode CLI tool pre-installed.
+Fedora 43-based container project with OpenCode CLI tool pre-installed.
 Focus on container image creation and deployment automation.
+
+## Troubleshooting
+- Build failures: Ensure network connectivity and retry build
+- Container runtime: Both podman and docker are supported

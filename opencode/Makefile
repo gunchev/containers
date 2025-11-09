@@ -1,4 +1,5 @@
-SHELL := /usr/bin/env bash # Use bash syntax, mitigates dash's printf on Debian(Ubuntu?), works on MacOS.
+SHELL := /usr/bin/env bash
+# ^^^ use bash syntax, mitigates dash's printf on Debian(Ubuntu?), works on MacOS.
 
 # Detect if podman is available, otherwise use docker.
 CONTAINER_CMD := $(shell if command -v podman >/dev/null 2>&1; then echo "podman"; else echo "docker"; fi)

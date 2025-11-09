@@ -1,20 +1,13 @@
-FROM docker.io/archlinux
+FROM docker.io/fedora:43
 
-RUN pacman -Sy --noconfirm curl zip unzip nnn \
-        shellcheck python-pylint autopep8 make \
-        npm yamllint markdownlint-cli prettier \
-    && pacman -Scc --noconfirm
+RUN dnf update -y && dnf install -y which curl git zip unzip nnn \
+        cmake clang-tools-extra shellcheck python3-pylint python3-autopep8 make \
+        glow nodejs npm yamllint hadolint \
+    && dnf clean all
 
-RUN touch /root/.bashrc && curl -fsSL https://opencode.ai/install | bash
+# Install opencode
+RUN touch /root/.bashrc; curl -fsSL https://opencode.ai/install | bash
 
 ENV PATH="/root/.opencode/bin:${PATH}"
-
-# Install hadolint directly from GitHub releases
-RUN \
-    curl -fsSL "https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64" -o /usr/local/bin/hadolint \
-    && chmod +x /usr/local/bin/hadolint
-
-# Install vitest globally
-RUN npm install -g vitest
 
 CMD ["/bin/bash"]
