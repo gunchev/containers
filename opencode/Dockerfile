@@ -1,7 +1,7 @@
 FROM docker.io/archlinux
 
 RUN pacman -Sy --noconfirm zip unzip nnn \
-        shellcheck python-pylint autopep8 \
+        shellcheck python-pylint autopep8 make \
     && pacman -Scc --noconfirm
 
 RUN touch /root/.bashrc && curl -fsSL https://opencode.ai/install | bash
