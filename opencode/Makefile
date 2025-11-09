@@ -20,6 +20,7 @@ help:
 	@echo "Available targets:"
 	@echo "    all, image:   Create the container image."
 	@echo "    clean:        Clean all generated files and images."
+	@echo "    lint:         Run linters on project files."
 	@echo
 	@echo "Usage:"
 	@echo "    make image"
@@ -45,3 +46,18 @@ image:
 .PHONY: clean
 clean:
 	-$(CONTAINER_CMD) image rm $(IMAGE_NAME):latest
+
+
+
+.PHONY: lint
+lint:
+	@echo "Running linters..."
+	@echo "Shell scripts:"
+	@shellcheck scripts/*
+	@echo "Dockerfile:"
+	@hadolint Dockerfile
+	@echo "YAML files:"
+	@find . -name "*.yml" -o -name "*.yaml" | xargs yamllint
+	@echo "JSON files:"
+	@find . -name "*.json" -o -name "*.jsonc" | xargs -I {} sh -c 'echo "Checking {}:" && jq empty {}'
+	@echo "Linting complete."
