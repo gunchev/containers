@@ -38,10 +38,10 @@ all: image
 .PHONY: image
 image:
 	"$(CONTAINER_CMD)" build --build-arg VERSION=$(VERSION) --platform linux/amd64 \
-            --tag $(IMAGE_NAME):$(VERSION) --tag $(IMAGE_NAME):latest .
+            --tag localhost/$(IMAGE_NAME):$(VERSION) --tag localhost/$(IMAGE_NAME):latest .
 
 
 
 .PHONY: clean
 clean:
-	"$(CONTAINER_CMD)" image rm "$(IMAGE_NAME):$(VERSION)" "$(IMAGE_NAME):latest"
+	"$(CONTAINER_CMD)" image rm "localhost/$(IMAGE_NAME):$(VERSION)" "localhost/$(IMAGE_NAME):latest"
