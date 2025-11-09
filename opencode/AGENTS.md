@@ -1,17 +1,20 @@
 # OpenCode Container - Agent Guidelines
 
-## Build Commands
-- `make all` or `make opencode-image`: Build container with podman/docker (linux/amd64)
-- `make clean`: Remove generated container files
-- `make help`: Show available targets
+## Build/Lint/Test Commands
+- Build: `make all` or `make opencode-image` (podman/docker, linux/amd64)
+- Clean: `make clean` (remove generated container files)
+- Help: `make help` (show available targets)
+- Lint: `shellcheck` (shell), `pylint` (Python), `autopep8 --diff` (Python), `yamllint` (YAML), `markdownlint-cli` (Markdown), `hadolint` (Dockerfiles)
+- Format: `prettier` (JS/TS/CSS/HTML/JSON/YAML/Markdown), `autopep8` (Python)
+- Test: `vitest` (JavaScript/TypeScript), no specific test commands (container project, manual testing via container builds)
 
 ## Code Style Guidelines
-- Text Files: Always add trailing new line in all text files as defined in the [POSIX standard](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206).
+- Text Files: Always add trailing newline per [POSIX standard](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206)
 - Indentation: 4 spaces (Python/C/C++/shell), 2 spaces (JS/JSON/HTML/YAML), tabs (Makefile/Go)
 - Max line length: 120 characters
 - UTF-8 encoding with LF line endings, trim trailing whitespace
-- Follow EditorConfig settings in .editorconfig
 - Public domain licensing (Unlicense)
+- Bash: Use `set -euo pipefail`, quote variables, prefer `[[ ]]` over `[ ]`
 
 ## Project Structure
 ArchLinux-based container project with OpenCode CLI tool pre-installed.
