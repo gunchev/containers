@@ -1,4 +1,6 @@
-FROM docker.io/fedora:43 as stage_1
+FROM docker.io/fedora:43 as fedora_updated
+
+ARG VERSION
 
 WORKDIR /root
 
@@ -11,16 +13,17 @@ RUN dnf -y update \
     && dnf -y clean all
 
 
-FROM stage_1 as stage_2
+FROM fedora_updated as ollama_installed
 
 RUN \
-    curl -fsSL https://ollama.com/download/ollama-linux-amd64.tgz | tar -xzv -C /usr/local
+    echo https://github.com/ollama/ollama/releases/download/v${VERSION}/ollama-linux-amd64.tgz && \
+    curl -fsSL https://github.com/ollama/ollama/releases/download/v${VERSION}/ollama-linux-amd64.tgz | tar -xzv -C /usr/local
 
 # This is to support AMD ROCM, 5.6 GiB / 8.6 GiB. Disabling to save space.
 # RUN curl -fsSL https://ollama.com/download/ollama-linux-amd64-rocm.tgz | tar -xzv -C /usr/local
 
 
-# FROM stage_2 as stage_3
+FROM ollama_installed as ollama_user_setup
 
 #RUN --network=none \
 #    useradd -r -s /bin/false -U -m -d /usr/local/share/ollama ollama \

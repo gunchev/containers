@@ -29,18 +29,23 @@ This project provides an easy way to run Ollama AI models in containers with NVI
    cd containers/ollama
    ```
 
-2. Build the container image:
+2. Build the container image with the latest ollama version available:
    ```bash
    make image
    ```
 
-   Or with a custom tag:
+   Or a specific version:
    ```bash
-   make image TAG=my_custom_tag
+   make image VERSION=0.3.12   # explicitly specify version
    ```
 
 
 ## Usage
+
+Copy or symlink the scripts from `scripts/*` in your `~/bin/` directory and add it to your `${PATH}` for easy access.
+```bash
+ln -s "${PWD}"/scripts/* ~/bin/
+```
 
 
 ### Start Ollama Server
@@ -55,9 +60,9 @@ This starts the Ollama server in the background with GPU support.
 ### Run Ollama Commands
 
 ```bash
-./scripts/ollama run llama2
-./scripts/ollama list
 ./scripts/ollama pull llama2
+./scripts/ollama list
+./scripts/ollama run llama2
 ```
 
 
@@ -67,12 +72,10 @@ This starts the Ollama server in the background with GPU support.
 ./scripts/ollama_test_nvidia_gpu
 ```
 
-This runs a quick test to verify NVIDIA GPU access in the container.
+This runs a quick test to verify NVIDIA GPU access in the container. Will print all available and accessible GPUs.
 
 
 ## Development
-
-Text Files should end with  trailing new line as defined in the [POSIX standard](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206).
 
 
 ### Build Commands
@@ -97,6 +100,7 @@ Unlicense License - see [LICENSE file](LICENSE) for details.
 ## Feedback
 
 Feel free to clone the project, open PRs and bug reports.
+Text Files should end with  trailing new line as defined in the [POSIX standard](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206).
 
 
 ## Configuration

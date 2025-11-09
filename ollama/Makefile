@@ -1,11 +1,13 @@
-SHELL := /usr/bin/env bash # Use bash syntax, mitigates dash's printf on Debian(Ubuntu?), works on MacOS.
+SHELL := /usr/bin/env bash
+# ^^^ use bash syntax, mitigates dash's printf on Debian(Ubuntu?), works on MacOS.
 
 # Detect if podman is available, otherwise use docker.
 CONTAINER_CMD := $(shell if command -v podman >/dev/null 2>&1; then echo "podman"; else echo "docker"; fi)
 
-# Allow overriding the image tag via `make opencode-image TAG=my_flavour`.
-TAG ?= latest
+# The container name
 IMAGE_NAME = ollama
+# Use version from the user or autodetect the ltatest.
+VERSION ?= $(shell curl -s https://api.github.com/repos/ollama/ollama/releases/latest | grep '"tag_name"' | sed -E 's/.*"v([^"]+)".*/\1/')
 
 
 
@@ -20,8 +22,11 @@ help:
 	@echo "    clean:        Clean all generated files and images."
 	@echo
 	@echo "Usage:"
-	@echo "    make image TAG=my_flavour  # Build with a custom tag"
+	@echo "    make image"
+	@echo "    make image VERSION=0.3.11  # Build specific (older) version"
 	@echo
+	@echo "Developer info:"
+	@printf -- "- SHELL=%q, CONTAINER_CMD=%q, VERSION=%q.\n\n" "$(SHELL)" "$(CONTAINER_CMD)" "$(VERSION)"
 
 
 
@@ -32,11 +37,11 @@ all: image
 
 .PHONY: image
 image:
-	$(CONTAINER_CMD) build --platform linux/amd64 --tag $(IMAGE_NAME):$(TAG) .
-	$(CONTAINER_CMD) tag $(IMAGE_NAME):$(TAG) $(IMAGE_NAME):$(shell $(CONTAINER_CMD) run --rm $(IMAGE_NAME):$(TAG) ollama --version | grep version | sed 's/.* version is //g')
+	"$(CONTAINER_CMD)" build --build-arg VERSION=$(VERSION) --platform linux/amd64 \
+            --tag $(IMAGE_NAME):$(VERSION) --tag $(IMAGE_NAME):latest .
 
 
 
 .PHONY: clean
 clean:
-	$(CONTAINER_CMD) image rm $(IMAGE_NAME)
+	"$(CONTAINER_CMD)" image rm "$(IMAGE_NAME):$(VERSION)" "$(IMAGE_NAME):latest"
