@@ -1,0 +1,20 @@
+// Sample ~/.config/opencode/opencode.jsonc configuration file (JSON + comments = jsonc)
+
+{
+  "$schema": "https://opencode.ai/config.json",
+  "theme": "opencode",
+  "autoupdate": false,
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama (local)",
+      "options": { "baseURL": "http://127.0.0.1:11434/v1" },
+      "models": {
+        "qwen3:8b":         { "name": "qwen3:8b"         }, // Context: 40K,  seems to be the best choice for now.
+        "mistral:7b":       { "name": "mistral:7b"       }, // Context: 32K
+        "mistral-nemo:12b": { "name": "mistral-nemo:12b" }, // Context: 1000K
+        "gpt-oss:20b":      { "name": "gpt-oss:20b"      }  // Context: 128K
+      }
+    }
+  }
+}
