@@ -3,6 +3,9 @@ FROM docker.io/fedora:43
 RUN dnf update -y && dnf install -y which curl git zip unzip nnn \
         cmake clang-tools-extra shellcheck python3-pylint python3-autopep8 make \
         glow nodejs npm yamllint hadolint \
+        ripgrep fzf bat fd-find jq gojq parallel \
+        golang rust java-latest-openjdk-devel rust-analyzer \
+        ninja-build gcc gcc-c++ gdb \
     && dnf clean all
 
 # Install opencode
