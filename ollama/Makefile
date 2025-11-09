@@ -6,7 +6,7 @@ CONTAINER_CMD := $(shell if command -v podman >/dev/null 2>&1; then echo "podman
 
 # The container name
 IMAGE_NAME = ollama
-# Use version from the user or autodetect the ltatest.
+# Use version from the user or autodetect the latest.
 VERSION ?= $(shell curl -s https://api.github.com/repos/ollama/ollama/releases/latest | grep '"tag_name"' | sed -E 's/.*"v([^"]+)".*/\1/')
 
 
@@ -44,4 +44,4 @@ image:
 
 .PHONY: clean
 clean:
-	"$(CONTAINER_CMD)" image rm "localhost/$(IMAGE_NAME):$(VERSION)" "localhost/$(IMAGE_NAME):latest"
+	-"$(CONTAINER_CMD)" image rm "localhost/$(IMAGE_NAME):$(VERSION)" "localhost/$(IMAGE_NAME):latest"
