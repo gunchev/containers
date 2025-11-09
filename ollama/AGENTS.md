@@ -23,3 +23,5 @@
 - **Functions**: Use `local` for variables; avoid global scope pollution
 - **Text files**: UTF-8, LF endings, 120 char lines, trailing newlines, trim whitespace
 - **Error handling**: Check command existence before use, provide meaningful error messages
+- **Dockerfile**: Multi-stage builds, combine RUN layers, use ARG for versions
+- **Makefile**: Use .PHONY for non-file targets, proper shell detection
