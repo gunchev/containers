@@ -16,7 +16,6 @@ RUN dnf -y update \
 FROM fedora_updated as ollama_installed
 
 RUN \
-    echo https://github.com/ollama/ollama/releases/download/v${VERSION}/ollama-linux-amd64.tgz && \
     curl -fsSL https://github.com/ollama/ollama/releases/download/v${VERSION}/ollama-linux-amd64.tgz | tar -xzv -C /usr/local
 
 # This is to support AMD ROCM, 5.6 GiB / 8.6 GiB. Disabling to save space.

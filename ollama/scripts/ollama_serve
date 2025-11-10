@@ -14,4 +14,6 @@ exec "${CONTAINER_CMD}" run --rm -d \
     -v "${HOME}/.ollama:/root/.ollama" \
     --name ollama \
     \
-    localhost/ollama:latest
+    localhost/ollama:latest \
+    \
+    /usr/local/bin/ollama serve

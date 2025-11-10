@@ -1,7 +1,6 @@
 # OpenCode container TODO
 
 ## TOP
-- [ ] Add entry point and special commands like `serve`, `stop`...
 - [ ] Create non-root user in container instead of running as root
 
 ## Improvements
