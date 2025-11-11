@@ -5,9 +5,9 @@
 - Build specific version: `make image VERSION=1.0.51` (build specific opencode version)
 - Clean: `make clean` (remove generated container files)
 - Help: `make help` (show available targets)
-- Lint: `shellcheck` (shell), `pylint` (Python), `yamllint` (YAML), `hadolint` (Dockerfiles)
+- Lint: `make lint` (runs shellcheck, hadolint, yamllint, jq validation)
 - Format: `prettier` (JS/TS/CSS/HTML/JSON/YAML/Markdown), `autopep8` (Python)
-- Test: Manual testing via container builds (no automated test suite)
+- Test: `make test` (runs nested container test: podman run alpine echo hello)
 
 ## Code Style Guidelines
 - Text Files: Always add trailing newline per [POSIX standard](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_206)
@@ -21,6 +21,7 @@
 - Functions: Use `local` for variables, avoid global scope pollution
 - Error handling: Check command existence, provide meaningful error messages
 - Dockerfile: Multi-stage builds, combine RUN layers, use ARG for versions
+- JSONC: Use JSON with comments for configuration files (configs/*.jsonc)
 
 ## Project Structure
 Fedora 43-based container with OpenCode CLI tool pre-installed.

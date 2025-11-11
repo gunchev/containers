@@ -37,7 +37,7 @@ RUN groupadd -g ${GID} ${USER} && useradd -l -u ${UID} -g ${USER} -c "${USER} Us
 COPY /containers.conf /etc/containers/containers.conf
 COPY /podman-containers.conf /home/${USER}/.config/containers/containers.conf
 
-RUN mkdir -p /home/${USER}/.local/share/containers \
+RUN mkdir -p /home/${USER}/bin /home/${USER}/.local/share/containers \
     && chown ${USER}:${USER} -R /home/${USER} \
     && chmod 0644 /etc/containers/containers.conf
 
@@ -81,7 +81,25 @@ WORKDIR /home/${USER}
 
 # Install opencode
 ARG VERSION
-RUN touch .bashrc && export VERSION=${VERSION} && /usr/bin/bash -o pipefail -c "curl -fsSL https://opencode.ai/install | bash"
+RUN ARCH=$(uname -m) && \
+    if [[ "$ARCH" == "aarch64" ]]; then \
+        ARCH="arm64"; \
+    elif [[ "$ARCH" == "x86_64" ]]; then \
+        ARCH="x64"; \
+    fi && \
+    FILENAME="opencode-linux-${ARCH}.zip" && \
+    if [[ -n "${VERSION}" ]]; then \
+        URL="https://github.com/sst/opencode/releases/download/v${VERSION}/${FILENAME}"; \
+    else \
+        URL="https://github.com/sst/opencode/releases/latest/download/${FILENAME}"; \
+    fi && \
+    mkdir -p /home/${USER}/bin && \
+    cd /tmp && \
+    curl -fsSL -o "${FILENAME}" "${URL}" && \
+    unzip -q "${FILENAME}" && \
+    mv opencode "/home/${USER}/bin/" && \
+    chmod 755 "/home/${USER}/bin/opencode" && \
+    rm -f "${FILENAME}"
 
 # USER root
 # WORKDIR /

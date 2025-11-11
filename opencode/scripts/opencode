@@ -21,4 +21,4 @@ exec "${CONTAINER_CMD}" run \
         --userns=keep-id \
     --workdir "$PWD" \
     --rm -it localhost/opencode:latest \
-    ~/.opencode/bin/opencode "$@"
+    ~/bin/opencode "$@"
