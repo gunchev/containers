@@ -11,6 +11,7 @@
       "options": { "baseURL": "http://127.0.0.1:11434/v1" },
       "models": {
         "qwen3:8b":         { "name": "qwen3:8b"         }, // Context: 40K,  seems to be the best choice for now.
+        "qwen3:30b":        { "name": "qwen3:30b"        }, // Context: 256K
         "mistral:7b":       { "name": "mistral:7b"       }, // Context: 32K
         "mistral-nemo:12b": { "name": "mistral-nemo:12b" }, // Context: 1000K
         "gpt-oss:20b":      { "name": "gpt-oss:20b"      }  // Context: 128K

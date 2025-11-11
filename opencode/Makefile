@@ -21,6 +21,7 @@ help:
 	@echo "    all, image:   Create the container image."
 	@echo "    clean:        Clean all generated files and images."
 	@echo "    lint:         Run linters on project files."
+	@echo "    test:         Run a container inside the opencode container to print hello world."
 	@echo
 	@echo "Usage:"
 	@echo "    make image"
@@ -38,14 +39,16 @@ all: image
 
 .PHONY: image
 image:
-	"$(CONTAINER_CMD)" build --build-arg VERSION=$(VERSION) --platform linux/amd64 \
+	"$(CONTAINER_CMD)" build \
+            --build-arg VERSION=$(VERSION) --build-arg USER=$(USER) --build-arg UID=$(shell id -u) --build-arg GID=$(shell id -g) \
             --tag localhost/$(IMAGE_NAME):$(VERSION) --tag localhost/$(IMAGE_NAME):latest .
 
 
 
 .PHONY: clean
 clean:
-	-$(CONTAINER_CMD) image rm $(IMAGE_NAME):latest
+	-$(CONTAINER_CMD) image rm $(IMAGE_NAME):latest 2>/dev/null || true
+	-$(CONTAINER_CMD) image rm $(IMAGE_NAME):$(VERSION) 2>/dev/null || true
 
 
 
@@ -54,10 +57,16 @@ lint:
 	@echo "Running linters..."
 	@echo "Shell scripts:"
 	@shellcheck scripts/*
-	@echo "Dockerfile:"
-	@hadolint Dockerfile
+	@echo "Containerfile:"
+	@hadolint Containerfile
 	@echo "YAML files:"
 	@find . -name "*.yml" -o -name "*.yaml" | xargs yamllint
 	@echo "JSON files:"
 	@find . -name "*.json" -o -name "*.jsonc" | xargs -I {} sh -c 'echo "Checking {}:" && jq empty {}'
 	@echo "Linting complete."
+
+
+
+.PHONY: test
+test:
+	podman run -it --security-opt label=disable --user podman --device /dev/fuse localhost/opencode:latest podman run alpine echo hello

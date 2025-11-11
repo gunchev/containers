@@ -6,8 +6,8 @@ Both podman and docker should work (I use podman BTW).
 The container is based on [Fedora 43](https://www.fedoraproject.org/) because:
 
 1. [Alpine](https://www.alpinelinux.org/) did not work (my fault?).
-3. ArchLinux AUR went down and I had no choice, so I don't use Arch BTW :-(
-2. Fedora provides a stable, well-supported base with excellent package management. The image also turns out to be smaller.
+2. ArchLinux AUR went down and I had no choice, so I don't use Arch BTW :-(
+3. Fedora provides a stable, well-supported base with excellent package management. The image also turns out to be smaller.
 
 
 ## Features
@@ -22,6 +22,7 @@ The container is based on [Fedora 43](https://www.fedoraproject.org/) because:
 ## Prerequisites
 
 - Linux system with Podman or Docker installed
+- Internet connection for downloading packages and OpenCode
 
 
 ## Installation
@@ -54,6 +55,15 @@ Copy or symlink the scripts from `scripts/*` in your `~/bin/` directory and add 
 ln -s "${PWD}"/scripts/* ~/bin/
 ```
 
+Example usage:
+```bash
+# Run OpenCode in current directory
+opencode
+
+# Pass arguments to OpenCode
+opencode --help
+```
+
 
 ## License
 
@@ -70,18 +80,39 @@ Text Files should end with  trailing new line as defined in the [POSIX standard]
 
 The container is configured with:
 - TERM environment variable forwarded
-- Persistent storage mounted ...
+- Persistent storage mounted for:
+  - `$HOME/.local/share/opencode` (data directory)
+  - `$HOME/.config/opencode` (configuration directory)
+  - `$HOME/.local/share/containers` (container storage)
+- Network access via host networking
+- FUSE device support for nested containers
 
 
 ## Troubleshooting
 
+### Common Issues
+
+- **Permission denied**: Ensure user is in appropriate groups for Podman/Docker
+- **Container fails to start**: Check if `/dev/fuse` is available and accessible
+- **Network issues**: Verify host networking is properly configured
+- **Storage problems**: Ensure sufficient disk space and proper permissions
 
 ### Container Runtime
 
 - The scripts automatically detect Podman vs Docker
 - Default preference: Podman > Docker
 
+### Security Considerations
+
+This container requires elevated privileges:
+- `--cap-add SYS_ADMIN,MKNOD` for container management
+- `--device /dev/fuse` for overlay filesystem support
+- `--security-opt label=disable` for nested containers
+Only run trusted code and review security implications for your environment.
+
 
 ## Resources
 
 - [OpenCode Documentation](https://opencode.ai/docs)
+- [How to use Podman inside of a container](https://www.redhat.com/en/blog/podman-inside-container)
+- [Podman Image](https://github.com/containers/image_build/tree/main/podman)
