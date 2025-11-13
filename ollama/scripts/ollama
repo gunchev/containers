@@ -4,6 +4,137 @@ set -euo pipefail
 shopt -s nullglob dotglob
 
 CONTAINER_CMD=$(if command -v podman >/dev/null 2>&1; then echo "podman"; else echo "docker"; fi)
+CONTAINER_NAME="ollama"
 
-exec "${CONTAINER_CMD}" exec -it -e TERM \
-    ollama /usr/local/bin/ollama "$@"
+# Function to show usage
+show_usage() {
+    cat << 'USAGE_END'
+Usage: ollama [COMMAND] [ARGS...]
+
+Commands:
+    start, serve    Start the ollama server container
+    stop            Stop and remove the ollama container
+    status          Get the status of the ollama container
+    shell           Get shell access to the running container
+    [args...]       Execute ollama command inside container (e.g., list, pull, run)
+
+Examples:
+    ollama start               # Start the server
+    ollama list                # List downloaded models
+    ollama pull llama2         # Pull a model
+    ollama run llama2          # Run a model
+    ollama status              # Get status
+    ollama stop                # Stop the server
+    ollama shell               # Get shell access
+USAGE_END
+}
+
+# Function to start the container
+start_container() {
+    mkdir -p "${HOME}/.ollama"
+
+    # Check if container is already running
+    if "${CONTAINER_CMD}" ps --format "table {{.Names}}" | grep -q "^${CONTAINER_NAME}$"; then
+        echo "Container '${CONTAINER_NAME}' is already running."
+        return 0
+    fi
+
+    echo "Starting ollama server container..."
+    exec "${CONTAINER_CMD}" run --rm -d \
+        --network=host \
+        --device nvidia.com/gpu=all \
+        --security-opt=label=disable \
+        -v "${HOME}/.ollama:/root/.ollama" \
+        --name "${CONTAINER_NAME}" \
+        localhost/ollama:latest \
+        /usr/local/bin/ollama serve
+}
+
+# Show container status
+show_status() {
+    # Check if container exists (running or stopped)
+    if "${CONTAINER_CMD}" ps -a --format "table {{.Names}}" | grep -q "^${CONTAINER_NAME}$"; then
+        # Container exists, get detailed info
+        if "${CONTAINER_CMD}" ps --format "table {{.Names}}" | grep -q "^${CONTAINER_NAME}$"; then
+            STATUS="RUNNING"
+        else
+            STATUS="STOPPED"
+        fi
+
+        # Extract and display information
+        echo "Ollama Container Status: ${STATUS}"
+        echo "Container Runtime: ${CONTAINER_CMD}"
+
+        # Get container ID
+        CONTAINER_ID=$("${CONTAINER_CMD}" ps -a --format "{{.ID}}" --filter "name=${CONTAINER_NAME}" | head -1)
+        echo "Container ID: ${CONTAINER_ID}"
+
+        # Get image
+        IMAGE=$("${CONTAINER_CMD}" ps -a --format "{{.Image}}" --filter "name=${CONTAINER_NAME}" | head -1)
+        echo "Image: ${IMAGE}"
+
+        # Get creation time
+        CREATED=$("${CONTAINER_CMD}" ps -a --format "{{.CreatedAt}}" --filter "name=${CONTAINER_NAME}" | head -1)
+        echo "Created: ${CREATED}"
+
+        # Show ports if applicable
+        PORTS=$("${CONTAINER_CMD}" ps -a --format "{{.Ports}}" --filter "name=${CONTAINER_NAME}" | head -1)
+        if [[ -n "${PORTS}" && "${PORTS}" != "<no value>" ]]; then
+            echo "Ports: ${PORTS}"
+        else
+           echo "Network: host"
+        fi
+    else
+        # Container doesn't exist
+        echo "Ollama Container Status: NOT CREATED"
+        echo "Container Runtime: ${CONTAINER_CMD}"
+        echo "Use 'ollama start' to create and start the container."
+    fi
+}
+
+# Function to stop the container
+stop_container() {
+    if "${CONTAINER_CMD}" ps --format "table {{.Names}}" | grep -q "^${CONTAINER_NAME}$"; then
+        echo "Stopping ollama server container..."
+        "${CONTAINER_CMD}" stop "${CONTAINER_NAME}"
+    else
+        echo "Container '${CONTAINER_NAME}' is not running."
+    fi
+}
+
+# Execute command in container (shared function for shell access and ollama commands)
+exec_in_container() {
+    if ! "${CONTAINER_CMD}" ps --format "table {{.Names}}" | grep -q "^${CONTAINER_NAME}$"; then
+        echo "Container '${CONTAINER_NAME}' is not running. Start it with: ollama start"
+        exit 1
+    fi
+
+    exec "${CONTAINER_CMD}" exec -it -e TERM="${TERM:-xterm-256color}" "${CONTAINER_NAME}" "$@"
+}
+
+# Main logic
+case "${1:-}" in
+    "start"|"serve")
+        start_container
+        ;;
+    "status")
+        show_status
+        ;;
+    "stop")
+        stop_container
+        ;;
+    "shell")
+        shift
+        if [[ $# -eq 0 ]]; then
+            exec_in_container /usr/bin/bash
+        else
+            exec_in_container "$@"
+        fi
+        ;;
+    "help"|"")
+        show_usage
+        ;;
+    *)
+        exec_in_container /usr/local/bin/ollama "$@"
+        ;;
+esac

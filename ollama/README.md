@@ -11,7 +11,7 @@ This project provides an easy way to run Ollama AI models in containers with NVI
 - 🛠️ Support for both Podman and Docker
 - 🔧 Automated container runtime detection
 - 📦 Pre-installed monitoring tools (nvtop, htop, ncdu, nnn, nmap-ncat)
-- 🏃‍♂️ Ready-to-use scripts for testing and deployment
+- 🏃‍♂️ Unified script interface for all operations
 
 
 ## Prerequisites
@@ -42,27 +42,57 @@ This project provides an easy way to run Ollama AI models in containers with NVI
 
 ## Usage
 
-Copy or symlink the scripts from `scripts/*` in your `~/bin/` directory and add it to your `${PATH}` for easy access.
+Copy or symlink the unified script from `scripts/ollama` in your `~/bin/` directory and add it to your `${PATH}` for easy access.
 ```bash
-ln -s "${PWD}"/scripts/* ~/bin/
+ln -s "${PWD}"/scripts/ollama ~/bin/
 ```
 
 
-### Start Ollama Server
+### Unified Script Interface
+
+The `ollama` script provides a unified interface for all operations:
 
 ```bash
-./scripts/ollama_serve
-```
+# Start the ollama server
+./scripts/ollama start
+# or
+./scripts/ollama serve
 
-This starts the Ollama server in the background with GPU support.
+# Stop the ollama server
+./scripts/ollama stop
 
-
-### Run Ollama Commands
-
-```bash
-./scripts/ollama pull llama2
+# Run ollama commands
 ./scripts/ollama list
+./scripts/ollama pull llama2
 ./scripts/ollama run llama2
+
+# Get shell access to the running container
+./scripts/ollama shell
+
+# Show help
+./scripts/ollama help
+```
+
+### Command Examples
+
+```bash
+# Start the server in background
+./scripts/ollama start
+
+# List available models
+./scripts/ollama list
+
+# Pull a model
+./scripts/ollama pull llama2
+
+# Run a model
+./scripts/ollama run llama2 "Hello, how are you?"
+
+# Get shell access for debugging
+./scripts/ollama shell
+
+# Stop the server when done
+./scripts/ollama stop
 ```
 
 
@@ -87,9 +117,8 @@ This runs a quick test to verify NVIDIA GPU access in the container. Will print 
 
 ### Scripts
 
+- `./scripts/ollama`: Unified script for all ollama operations
 - `./scripts/ollama_test_nvidia_gpu`: Test GPU access
-- `./scripts/ollama_serve`: Start server for integration testing
-- `./scripts/ollama <args>`: Execute commands in container
 
 
 ## License
