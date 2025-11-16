@@ -14,14 +14,15 @@ RUN dnf -y update \
     && dnf -y install --downloadonly nvidia-container-toolkit nvidia-container-toolkit-base libnvidia-container-tools libnvidia-container1 \
     && rpm -ihv --nodigest --nofiledigest /var/cache/libdnf*/nvidia-container-toolkit-*/packages/*.rpm \
     && dnf -y clean all \
-    && curl -fsSL https://github.com/ollama/ollama/releases/download/v${VERSION}/ollama-linux-amd64.tgz | tar -xzv -C /usr/local \
-    && groupadd -g ${GID} ${USER} && useradd -l -u ${UID} -g ${USER} -c "${USER} User" -m ${USER}
+    && curl -fsSL https://github.com/ollama/ollama/releases/download/v${VERSION}/ollama-linux-amd64.tgz | tar -xzv -C /usr/local
+
+#    && groupadd -g ${GID} ${USER} && useradd -l -u ${UID} -g ${USER} -c "${USER} User" -m ${USER}
 
 # This is to support AMD ROCM, 5.6 GiB / 8.6 GiB. Disabling to save space.
 # RUN curl -fsSL https://ollama.com/download/ollama-linux-amd64-rocm.tgz | tar -xzv -C /usr/local
 
-USER ${USER}
-
-WORKDIR /home/${USER}
+# USER ${USER}
+#
+# WORKDIR /home/${USER}
 
 CMD /usr/local/bin/ollama serve
