@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/fedora:43
+FROM registry.fedoraproject.org/fedora:43 as fedora_updated
 
 ARG VERSION
 ARG USER

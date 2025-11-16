@@ -7,7 +7,7 @@
 
 ### Critical Issues
 - [ ] Add checksum verification for all downloads (nvidia repo, ollama binary). Upstream problem.
-- [ ] Fix fragile wildcard path in Dockerfile:12 for nvidia packages (solved by the previous one)
+- [ ] Fix fragile wildcard path in Containerfile:12 for nvidia packages (solved by the previous one)
 
 ### Security Improvements
 - [ ] Add integrity checks for all external downloads
@@ -15,8 +15,8 @@
 - [ ] Review --security-opt=label=disable necessity
 
 ### Efficiency Optimizations
-- [ ] Combine Dockerfile RUN layers for smaller image size
-- [ ] Add .dockerignore file to exclude unnecessary files
+- [x] Combine Containerfile RUN layers for smaller image size
+- [x] Add .dockerignore file to exclude unnecessary files
 - [ ] Optimize base image by removing unnecessary packages
 
 ### Documentation Fixes

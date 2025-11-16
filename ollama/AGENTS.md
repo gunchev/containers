@@ -22,7 +22,7 @@
 - **Functions**: Use `local` for variables; avoid global scope pollution
 - **Text files**: UTF-8, LF endings, 120 char lines, trailing newlines, trim whitespace
 - **Error handling**: Check command existence before use, provide meaningful error messages
-- **Dockerfile**: Multi-stage builds, combine RUN layers, use ARG for versions, Fedora base
+- **Containerfile**: Multi-stage builds, combine RUN layers, use ARG for versions, Fedora base
 - **Makefile**: Use .PHONY for non-file targets, force bash shell with `/usr/bin/env bash`
 
 ## Project Structure
