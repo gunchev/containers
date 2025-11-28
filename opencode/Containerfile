@@ -87,7 +87,7 @@ RUN ARCH=$(uname -m) && \
     elif [[ "$ARCH" == "x86_64" ]]; then \
         ARCH="x64"; \
     fi && \
-    FILENAME="opencode-linux-${ARCH}.zip" && \
+    FILENAME="opencode-linux-${ARCH}.tar.gz" && \
     if [[ -n "${VERSION}" ]]; then \
         URL="https://github.com/sst/opencode/releases/download/v${VERSION}/${FILENAME}"; \
     else \
@@ -96,7 +96,7 @@ RUN ARCH=$(uname -m) && \
     mkdir -p /home/${USER}/bin && \
     cd /tmp && \
     curl -fsSL -o "${FILENAME}" "${URL}" && \
-    unzip -q "${FILENAME}" && \
+    tar -xvf "${FILENAME}" && \
     mv opencode "/home/${USER}/bin/" && \
     chmod 755 "/home/${USER}/bin/opencode" && \
     rm -f "${FILENAME}"
