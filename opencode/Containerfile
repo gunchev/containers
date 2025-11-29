@@ -19,7 +19,7 @@ RUN dnf -y makecache && \
         which curl git zip unzip nnn mc vim-enhanced pico nano \
         findutils gawk jq sed util-linux \
         cmake clang-tools-extra shellcheck whiptail python3-pylint python3-autopep8 make \
-        glow nodejs npm \
+        glow nodejs npm fuser tar pv coreutils openssh-clients nmap-ncat \
         shfmt black uv ruff python3-isort python3-fixit \
         yamllint hadolint python3-ansible-lint csslint rpmlint gitlint \
         ripgrep fzf bat fd-find jq gojq parallel \
