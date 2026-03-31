@@ -22,6 +22,7 @@ help:
 	@echo "    clean:        Clean all generated files and images."
 	@echo "    lint:         Run linters on project files."
 	@echo "    test:         Run a container inside the opencode container to print hello world."
+	@echo "    toolbox:      Create toolbox"
 	@echo
 	@echo "Usage:"
 	@echo "    make image"
@@ -70,3 +71,10 @@ lint:
 .PHONY: test
 test:
 	podman run -it --security-opt label=disable --user podman --device /dev/fuse localhost/opencode:latest podman run alpine echo hello
+
+
+
+.PHONY: toolbox
+toolbox:
+	toolbox create -c opencode-toolbox -i localhost/opencode:latest
+	echo "Use 'toolbox enter opencode-toolbox' to enter the toolbox"
