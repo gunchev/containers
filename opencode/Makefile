@@ -7,7 +7,7 @@ CONTAINER_CMD := $(shell if command -v podman >/dev/null 2>&1; then echo "podman
 # The container name
 IMAGE_NAME = opencode
 # Use version from the user or autodetect the latest.
-VERSION ?= $(shell curl -s https://api.github.com/repos/sst/opencode/releases/latest | grep '"tag_name"' | sed -E 's/.*"v([^"]+)".*/\1/')
+VERSION ?= $(shell curl -sL https://api.github.com/repos/sst/opencode/releases/latest | grep '"tag_name"' | sed -E 's/.*"v([^"]+)".*/\1/')
 
 
 
