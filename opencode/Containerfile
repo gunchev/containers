@@ -1,21 +1,20 @@
 FROM registry.fedoraproject.org/fedora:43 as fedora_updated
 
 ARG VERSION
-ARG USER
-ARG UID
-ARG GID
 
 # We want the latest versions.
 # hadolint ignore=DL3041
 
-RUN printf "\n\n# Added during image build\n" >> /etc/dnf/dnf.conf && \
-    printf "minrate=100\ntimeout=60\n\n" >> /etc/dnf/dnf.conf
+RUN printf "\n\n# Added during image build\n" >> /etc/dnf/dnf.conf \
+    && printf "minrate=100\ntimeout=60\nmax_parallel_downloads=8\nfastestmirror=True\n" >> /etc/dnf/dnf.conf \
+    && printf "assumeyes=True\nkeepcache=1\nnodocs=True\ninstall_weak_deps=False\n" >> /etc/dnf/dnf.conf
 
-RUN dnf -y makecache && \
-    dnf -y update && \
+RUN --mount=type=cache,dst=/var/cache/libdnf5/ --mount=type=tmpfs,dst=/var/log --mount=type=tmpfs,dst=/tmp --mount=type=tmpfs,dst=/var/tmp \
+    dnf makecache && \
+    dnf update && \
     rpm --setcaps shadow-utils && \
-    dnf -y install --exclude container-selinux \
-        podman podman-compose podman-docker fuse-overlayfs containernetworking-plugins buildah skopeo openssh-clients cpp git-core sqlite \
+    dnf install \
+        podman podman-compose podman-docker fuse-overlayfs containernetworking-plugins buildah skopeo openssh-clients cpp sqlite \
         which curl git zip unzip nnn mc vim-enhanced pico nano \
         findutils gawk jq sed util-linux \
         cmake clang-tools-extra shellcheck whiptail python3-pylint python3-autopep8 make \
@@ -24,25 +23,22 @@ RUN dnf -y makecache && \
         yamllint hadolint python3-ansible-lint csslint rpmlint gitlint \
         ripgrep fzf bat fd-find jq gojq parallel \
         golang rust java-latest-openjdk-devel rust-analyzer \
-        ninja-build gcc gcc-c++ gdb cppcheck \
+        ninja-build gcc gcc-c++ gdb cppcheck dpkg mock rpmdevtools \
     --exclude container-selinux \
-    && dnf clean all \
-    && rm -fv /etc/machine-id /var/lib/systemd/random-seed /var/lib/dnf/repos/*/countme \
-    && rm -rf /var/cache /var/log/dnf* /var/log/hawkey.log /var/log/yum.*
+    && rm -fv /etc/machine-id /var/lib/systemd/random-seed
 
-RUN groupadd -g ${GID} ${USER} && useradd -l -u ${UID} -g ${USER} -c "${USER} User" -m ${USER} \
-    && printf "root:1:65535\n%s:1:999\n%s:1001:64535\n" "${USER}" "${USER}" > /etc/subuid \
-    && printf "root:1:65535\n%s:1:999\n%s:1001:64535\n" "${USER}" "${USER}" > /etc/subgid
+#     && rm -rf /var/cache
 
 COPY /containers.conf /etc/containers/containers.conf
-COPY /podman-containers.conf /home/${USER}/.config/containers/containers.conf
 
-RUN mkdir -p /home/${USER}/bin /home/${USER}/.local/share/containers \
-    && chown ${USER}:${USER} -R /home/${USER} \
-    && chmod 0644 /etc/containers/containers.conf
+# COPY /podman-containers.conf /home/${USER}/.config/containers/containers.conf
 
-RUN mkdir -p /run/user/${UID} \
-    && chown ${USER}:${USER} -R /run/user/${UID}
+#RUN mkdir -p /home/${USER}/bin /home/${USER}/.local/share/containers \
+#    && chown ${USER}:${USER} -R /home/${USER} \
+#    && chmod 0644 /etc/containers/containers.conf
+
+#RUN mkdir -p /run/user/${UID} \
+#    && chown ${USER}:${USER} -R /run/user/${UID}
 
 # Copy & modify the defaults to provide reference if runtime changes needed.
 # Changes here are required for running with fuse-overlay storage inside container.
@@ -59,25 +55,21 @@ RUN printf '/run/secrets/etc-pki-entitlement:/run/secrets/etc-pki-entitlement\n/
 # Note VOLUME options must always happen after the chown call above
 # RUN commands can not modify existing volumes
 VOLUME /var/lib/containers
-VOLUME /home/${USER}/.local/share/containers
+# VOLUME /home/${USER}/.local/share/containers
 
-RUN mkdir -p /var/lib/shared/overlay-images \
-             /var/lib/shared/overlay-layers \
-             /var/lib/shared/vfs-images \
-             /var/lib/shared/vfs-layers \
-    && touch /var/lib/shared/overlay-images/images.lock \
-    && touch /var/lib/shared/overlay-layers/layers.lock \
-    && touch /var/lib/shared/vfs-images/images.lock \
-    && touch /var/lib/shared/vfs-layers/layers.lock
+#RUN mkdir -p /var/lib/shared/overlay-images \
+#             /var/lib/shared/overlay-layers \
+#             /var/lib/shared/vfs-images \
+#             /var/lib/shared/vfs-layers \
+#    && touch /var/lib/shared/overlay-images/images.lock \
+#    && touch /var/lib/shared/overlay-layers/layers.lock \
+#    && touch /var/lib/shared/vfs-images/images.lock \
+#    && touch /var/lib/shared/vfs-layers/layers.lock
 
 ENV _CONTAINERS_USERNS_CONFIGURED="" \
     BUILDAH_ISOLATION=chroot
 
 
-
-USER ${USER}
-
-WORKDIR /home/${USER}
 
 # Install opencode
 ARG VERSION
@@ -93,15 +85,12 @@ RUN ARCH=$(uname -m) && \
     else \
         URL="https://github.com/sst/opencode/releases/latest/download/${FILENAME}"; \
     fi && \
-    mkdir -p /home/${USER}/bin && \
     cd /tmp && \
     curl -fsSL -o "${FILENAME}" "${URL}" && \
     tar -xvf "${FILENAME}" && \
-    mv opencode "/home/${USER}/bin/" && \
-    chmod 755 "/home/${USER}/bin/opencode" && \
+    mv opencode "/usr/local/bin/" && \
+    chmod 755 "/usr/local/bin/opencode" && \
     rm -f "${FILENAME}"
 
-# USER root
-# WORKDIR /
 
 CMD ["/usr/bin/bash"]

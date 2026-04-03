@@ -7,7 +7,7 @@ CONTAINER_CMD := $(shell if command -v podman >/dev/null 2>&1; then echo "podman
 # The container name
 IMAGE_NAME = ollama
 # Use version from the user or autodetect the latest.
-VERSION ?= $(shell curl -s https://api.github.com/repos/ollama/ollama/releases/latest | grep '"tag_name"' | sed -E 's/.*"v([^"]+)".*/\1/')
+VERSION ?= $(shell curl -sL https://api.github.com/repos/ollama/ollama/releases/latest | grep '"tag_name"' | sed -E 's/.*"v([^"]+)".*/\1/')
 
 
 
@@ -37,8 +37,7 @@ all: image
 
 .PHONY: image
 image:
-	"$(CONTAINER_CMD)" build --build-arg VERSION=$(VERSION) --build-arg USER=$(USER) \
-            --build-arg UID=$(shell id -u) --build-arg GID=$(shell id -g) --platform linux/amd64 \
+	"$(CONTAINER_CMD)" build --build-arg VERSION=$(VERSION) --platform linux/amd64 \
             --tag localhost/$(IMAGE_NAME):$(VERSION) --tag localhost/$(IMAGE_NAME):latest .
 
 
