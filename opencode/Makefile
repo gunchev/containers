@@ -41,7 +41,7 @@ all: image
 .PHONY: image
 image:
 	"$(CONTAINER_CMD)" build \
-            --build-arg VERSION=$(VERSION) --build-arg USER=$(USER) --build-arg UID=$(shell id -u) --build-arg GID=$(shell id -g) \
+            --build-arg VERSION=$(VERSION) \
             --tag localhost/$(IMAGE_NAME):$(VERSION) --tag localhost/$(IMAGE_NAME):latest .
 
 
