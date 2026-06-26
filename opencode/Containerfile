@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/fedora:43 as fedora_updated
+FROM registry.fedoraproject.org/fedora:44 as fedora_updated
 
 ARG VERSION
 
@@ -24,7 +24,6 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5/ --mount=type=tmpfs,dst=/var/log -
         ripgrep fzf bat fd-find jq gojq parallel \
         golang rust java-latest-openjdk-devel rust-analyzer \
         ninja-build gcc gcc-c++ gdb cppcheck dpkg mock rpmdevtools \
-    --exclude container-selinux \
     && rm -fv /etc/machine-id /var/lib/systemd/random-seed
 
 #     && rm -rf /var/cache
