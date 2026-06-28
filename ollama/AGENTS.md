@@ -26,4 +26,4 @@
 - **Makefile**: Use .PHONY for non-file targets, force bash shell with `/usr/bin/env bash`
 
 ## Project Structure
-Fedora 43-based container with ollama installed. Helper scripts in the `./scripts` directory.
+Fedora 44-based container with ollama installed. Helper scripts in the `./scripts` directory.
