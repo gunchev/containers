@@ -4,19 +4,20 @@
   "$schema": "https://opencode.ai/config.json",
   "autoupdate": false,
   "provider": {
-    "ollama": {
+    "llamacpp": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "Ollama (local)",
-      "options": { "baseURL": "http://127.0.0.1:11434/v1" },
+      "name": "llama.cpp (local)",
+      "options": { "baseURL": "http://127.0.0.1:7626/v1" },
       "models": {
-        "qwen3-coder:30b":              { "name": "qwen3-coder:30b"              }, // Context: 256K
-        "qwen3:8b":                     { "name": "qwen3:8b"                     }, // Context: 40K
-        "qwen3:30b":                    { "name": "qwen3:30b"                    }, // Context: 256K
-        "mistral:7b":                   { "name": "mistral:7b"                   }, // Context: 32K
-        "mistral-nemo:12b":             { "name": "mistral-nemo:12b"             }, // Context: 1000K
-        "mistral-small:22b":            { "name": "mistral-small:22b"            }, // Context: 128K
-        "gpt-oss:20b":                  { "name": "gpt-oss:20b"                  }, // Context: 128K
-        "anarko/qwen3-coder-flash:30b": { "name": "anarko/qwen3-coder-flash:30b" }  // Context: 256K
+        "Ornith-35B-BF16":                 { "name": "Ornith-35B-BF16"                 }, // Context: 262K, text only
+        "Ornith-35B":                      { "name": "Ornith-35B"                      }, // Context: 262K, text only
+        "Ornith-35B-UD-Q8_K_XL":           { "name": "Ornith-35B-UD-Q8_K_XL"           }, // Context: 262K, text only
+        "Qwen3.6-27B-DFlash-Q8_0":         { "name": "Qwen3.6-27B-DFlash-Q8_0"         }, // Context: 262K, text+image
+        "gemma-4-31B-it":                  { "name": "gemma-4-31B-it"                  }, // Context: 262K, text+image
+        "Gemma-26B":                       { "name": "Gemma-26B"                       }, // Context: 262K, text only
+        "Gemma-12B":                       { "name": "Gemma-12B"                       }, // Context: 262K, text only
+        "Gemma-E4B":                       { "name": "Gemma-E4B"                       }, // Context: 131K, text only
+        "Gemma-E2B":                       { "name": "Gemma-E2B"                       }  // Context: 131K, text only
       }
     }
   }
