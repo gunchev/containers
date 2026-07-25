@@ -1,0 +1,105 @@
+FROM registry.fedoraproject.org/fedora:44 as fedora_updated
+
+ARG VERSION
+
+# We want the latest versions.
+# hadolint ignore=DL3041
+
+RUN printf "\n\n# Added during image build\n" >> /etc/dnf/dnf.conf \
+    && printf "minrate=100\ntimeout=60\nmax_parallel_downloads=8\nfastestmirror=True\n" >> /etc/dnf/dnf.conf \
+    && printf "assumeyes=True\nkeepcache=1\nnodocs=True\ninstall_weak_deps=False\n" >> /etc/dnf/dnf.conf
+
+RUN --mount=type=cache,dst=/var/cache/libdnf5/ --mount=type=tmpfs,dst=/var/log --mount=type=tmpfs,dst=/tmp --mount=type=tmpfs,dst=/var/tmp \
+    dnf makecache && \
+    dnf update && \
+    rpm --setcaps shadow-utils && \
+    dnf install \
+        podman podman-compose podman-docker fuse-overlayfs containernetworking-plugins buildah skopeo openssh-clients cpp sqlite \
+        which curl git zip unzip nnn mc vim-enhanced pico nano \
+        findutils gawk jq sed util-linux \
+        cmake clang-tools-extra shellcheck whiptail python3-pylint python3-autopep8 make \
+        glow nodejs npm fuser tar pv coreutils openssh-clients nmap-ncat \
+        shfmt black uv ruff python3-isort python3-fixit \
+        yamllint hadolint python3-ansible-lint csslint rpmlint gitlint \
+        ripgrep fzf bat fd-find jq gojq parallel \
+        golang rust java-latest-openjdk-devel rust-analyzer \
+        ninja-build gcc gcc-c++ gdb cppcheck dpkg mock rpmdevtools \
+    && node -e 'const v=process.versions.node.split(".").map(Number); if(!(v[0]>22||(v[0]===22&&v[1]>=19))) process.exit(1)' \
+    && rm -fv /etc/machine-id /var/lib/systemd/random-seed
+
+COPY /containers.conf /etc/containers/containers.conf
+
+# Copy & modify the defaults to provide reference if runtime changes needed.
+# Changes here are required for running with fuse-overlay storage inside container.
+RUN sed -e 's|^#mount_program|mount_program|g' \
+           -e '/additionalimage.*/a "/var/lib/shared",' \
+           -e 's|^mountopt[[:space:]]*=.*$|mountopt = "nodev,fsync=0"|g' \
+           /usr/share/containers/storage.conf \
+           > /etc/containers/storage.conf
+
+# Setup internal Podman to pass subscriptions down from host to internal container
+RUN printf '/run/secrets/etc-pki-entitlement:/run/secrets/etc-pki-entitlement\n/run/secrets/rhsm:/run/secrets/rhsm\n' > /etc/containers/mounts.conf \
+    && touch /etc/machine-id
+
+# Note VOLUME options must always happen after the chown call above
+# RUN commands can not modify existing volumes
+VOLUME /var/lib/containers
+
+ENV _CONTAINERS_USERNS_CONFIGURED="" \
+    BUILDAH_ISOLATION=chroot \
+    PI_SKIP_VERSION_CHECK=1 \
+    PI_TELEMETRY=0 \
+    PI_OFFLINE=0
+
+
+# Install pi (https://pi.dev/) globally via npm.
+# Pin via --build-arg VERSION=0.82.0 ; default is the npm "latest" tag.
+# --ignore-scripts matches what the official pi.dev installer does and
+# --min-release-age=0 lets npm accept very fresh releases without waiting.
+# hadolint ignore=DL3041,DL3059
+ARG VERSION
+RUN npm install -g --ignore-scripts --min-release-age=0 "@earendil-works/pi-coding-agent@${VERSION:-latest}" \
+    && command -v pi \
+    && pi --version
+
+
+# OCI image labels so this image is identifiable in registries and `podman inspect`
+LABEL org.opencontainers.image.title="pi" \
+      org.opencontainers.image.description="Minimal terminal coding agent (pi.dev) on Fedora 44 with full opencode toolchain" \
+      org.opencontainers.image.source="https://github.com/gunchev/containers/tree/master/pi" \
+      org.opencontainers.image.url="https://github.com/gunchev/containers/tree/master/pi" \
+      org.opencontainers.image.documentation="https://pi.dev/" \
+      org.opencontainers.image.vendor="dgunchev" \
+      org.opencontainers.image.licenses="Unlicense" \
+      org.opencontainers.image.authors="dgunchev" \
+      org.opencontainers.image.created="2026-07-25T00:00:00Z"
+
+
+# Seed ~/.pi/agent/settings.json so first `pi` run skips the version ping
+# and the install telemetry.
+#   - /etc/skel/.pi/agent/settings.json is the template copied on demand.
+#   - /etc/profile.d/pi-agent-setup.sh bootstraps it on first interactive
+#     shell because toolbox 0.3's init-container only copies /etc/skel's
+#     top-level files (not hidden directories like .pi/agent).
+COPY /config/settings.json /etc/skel/.pi/agent/settings.json
+COPY /config/pi-agent-setup.sh /etc/profile.d/pi-agent-setup.sh
+RUN chmod 0755 /etc/profile.d/pi-agent-setup.sh
+
+
+# Create the in-container `podman` user so `make test` (and the helper
+# scripts' `--userns=keep-id`) can pass `--user podman` reliably.
+# We deliberately avoid UID 1000 because `toolbox init-container` will try
+# to useradd the host's first user (typically uid 1000) and fail with
+# "UID 1000 is not unique". UID 2000 is the next-sensible convention.
+RUN getent group podman >/dev/null || groupadd -g 2000 podman \
+    && useradd -m -d /home/podman -u 2000 -g podman -s /bin/bash podman \
+    && mkdir -p /run/user/2000 \
+              /etc/skel/.pi/agent /etc/skel/.local/share/pi /etc/skel/.config/pi \
+    && chown -R podman:podman /run/user/2000 /var/lib/containers /home/podman \
+                           /etc/skel/.pi /etc/skel/.local/share/pi /etc/skel/.config/pi \
+    && chmod 0644 /etc/skel/.pi/agent/settings.json
+
+USER podman
+WORKDIR /home/podman
+
+CMD ["/usr/bin/bash"]

@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+shopt -s nullglob dotglob
+
+mkdir -p "$HOME/.pi/agent" "$HOME/.config/pi" "$HOME/.local/share/pi" "$HOME/.local/share/containers"
+
+CONTAINER_CMD=$(if command -v podman >/dev/null 2>&1; then echo "podman"; else echo "docker"; fi)
+
+exec "${CONTAINER_CMD}" run \
+        --network=host \
+        -v "${PWD}:${PWD}" \
+        -v "${HOME}/.pi/agent:${HOME}/.pi/agent" \
+        -v "${HOME}/.config/pi:${HOME}/.config/pi" \
+        -v "${HOME}/.local/share/pi:${HOME}/.local/share/pi" \
+        -v "${HOME}/.local/share/containers:${HOME}/.local/share/containers" \
+        --cap-add SYS_ADMIN,MKNOD  \
+        --device /dev/fuse \
+        --security-opt label=disable \
+        --user "$USER" \
+        -e TERM \
+        --userns=keep-id \
+    --workdir "$PWD" \
+    --rm -it localhost/pi:latest \
+    pi "$@"

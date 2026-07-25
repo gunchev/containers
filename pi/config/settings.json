@@ -1,0 +1,10 @@
+{
+  "$schema": "https://pi.dev/config.json",
+  "autoupdate": false,
+  "enableInstallTelemetry": false,
+  "defaultProjectTrust": "never",
+  "transport": "auto",
+  "cacheRetention": "default",
+  "thinkingLevel": "medium",
+  "keybindings": {}
+}
