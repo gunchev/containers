@@ -26,18 +26,7 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5/ --mount=type=tmpfs,dst=/var/log -
         ninja-build gcc gcc-c++ gdb cppcheck dpkg mock rpmdevtools \
     && rm -fv /etc/machine-id /var/lib/systemd/random-seed
 
-#     && rm -rf /var/cache
-
 COPY /containers.conf /etc/containers/containers.conf
-
-# COPY /podman-containers.conf /home/${USER}/.config/containers/containers.conf
-
-#RUN mkdir -p /home/${USER}/bin /home/${USER}/.local/share/containers \
-#    && chown ${USER}:${USER} -R /home/${USER} \
-#    && chmod 0644 /etc/containers/containers.conf
-
-#RUN mkdir -p /run/user/${UID} \
-#    && chown ${USER}:${USER} -R /run/user/${UID}
 
 # Copy & modify the defaults to provide reference if runtime changes needed.
 # Changes here are required for running with fuse-overlay storage inside container.
@@ -54,20 +43,9 @@ RUN printf '/run/secrets/etc-pki-entitlement:/run/secrets/etc-pki-entitlement\n/
 # Note VOLUME options must always happen after the chown call above
 # RUN commands can not modify existing volumes
 VOLUME /var/lib/containers
-# VOLUME /home/${USER}/.local/share/containers
-
-#RUN mkdir -p /var/lib/shared/overlay-images \
-#             /var/lib/shared/overlay-layers \
-#             /var/lib/shared/vfs-images \
-#             /var/lib/shared/vfs-layers \
-#    && touch /var/lib/shared/overlay-images/images.lock \
-#    && touch /var/lib/shared/overlay-layers/layers.lock \
-#    && touch /var/lib/shared/vfs-images/images.lock \
-#    && touch /var/lib/shared/vfs-layers/layers.lock
 
 ENV _CONTAINERS_USERNS_CONFIGURED="" \
     BUILDAH_ISOLATION=chroot
-
 
 
 # Install opencode
@@ -91,5 +69,30 @@ RUN ARCH=$(uname -m) && \
     chmod 755 "/usr/local/bin/opencode" && \
     rm -f "${FILENAME}"
 
+
+# OCI image labels so this image is identifiable in registries and `podman inspect`.
+# Overrides the upstream-fed `org.opencontainers.image.title=fedora`.
+LABEL org.opencontainers.image.title="opencode" \
+      org.opencontainers.image.description="OpenCode (sst/opencode) AI coding agent on Fedora 43 with full toolchain" \
+      org.opencontainers.image.source="https://github.com/gunchev/containers/tree/master/opencode" \
+      org.opencontainers.image.url="https://github.com/gunchev/containers/tree/master/opencode" \
+      org.opencontainers.image.documentation="https://opencode.ai/" \
+      org.opencontainers.image.vendor="dgunchev" \
+      org.opencontainers.image.licenses="Unlicense" \
+      org.opencontainers.image.authors="dgunchev"
+
+
+# Create the in-container `podman` user so `make test` (and the helper
+# scripts' `--userns=keep-id`) can pass `--user podman` reliably.
+# Avoid UID 1000 because `toolbox init-container` will try to useradd the
+# host's first user (typically uid 1000) and fail with
+# "UID 1000 is not unique". UID 2000 is the next-sensible convention.
+RUN getent group podman >/dev/null || groupadd -g 2000 podman \
+    && useradd -m -d /home/podman -u 2000 -g podman -s /bin/bash podman \
+    && mkdir -p /run/user/2000 \
+    && chown -R podman:podman /run/user/2000 /var/lib/containers /home/podman
+
+USER podman
+WORKDIR /home/podman
 
 CMD ["/usr/bin/bash"]

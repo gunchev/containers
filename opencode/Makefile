@@ -52,6 +52,19 @@ clean:
 	-$(CONTAINER_CMD) image rm $(IMAGE_NAME):$(VERSION) 2>/dev/null || true
 
 
+.PHONY: prune
+prune:
+	@echo "Pruning dangling images…"
+	@$(CONTAINER_CMD) image prune -f
+	@echo "Pruning dangling/anonymous volumes…"
+	@$(CONTAINER_CMD) volume prune -f
+
+
+.PHONY: clean-all
+clean-all: clean prune
+	@echo "Toolbox container still present? Remove with: toolbox rm --force $(IMAGE_NAME)-toolbox"
+
+
 
 .PHONY: lint
 lint:
@@ -70,7 +83,9 @@ lint:
 
 .PHONY: test
 test:
-	podman run -it --security-opt label=disable --user podman --device /dev/fuse localhost/opencode:latest podman run alpine echo hello
+	podman run --rm --security-opt label=disable --user podman --device /dev/fuse --userns=keep-id localhost/opencode:latest opencode --version
+	@podman run --rm --security-opt label=disable --user podman --device /dev/fuse --userns=keep-id localhost/opencode:latest podman info --format '{{.Host.Security.RootlessUIDMapping}}' && echo "rootless container stack reachable" \
+		|| echo "Skipping nested podman check (requires newuidmap on host)"
 
 
 
