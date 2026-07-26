@@ -18,7 +18,7 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5/ --mount=type=tmpfs,dst=/var/log -
         which curl git zip unzip nnn mc vim-enhanced pico nano \
         findutils gawk jq sed util-linux \
         cmake clang-tools-extra shellcheck whiptail python3-pylint python3-autopep8 make \
-        glow nodejs npm fuser tar pv coreutils openssh-clients nmap-ncat \
+        glow nodejs npm nodejs-full-i18n fuser tar pv coreutils openssh-clients nmap-ncat \
         shfmt black uv ruff python3-isort python3-fixit \
         yamllint hadolint python3-ansible-lint csslint rpmlint gitlint \
         ripgrep fzf bat fd-find jq gojq parallel \
@@ -49,7 +49,8 @@ ENV _CONTAINERS_USERNS_CONFIGURED="" \
     BUILDAH_ISOLATION=chroot \
     PI_SKIP_VERSION_CHECK=1 \
     PI_TELEMETRY=0 \
-    PI_OFFLINE=0
+    PI_OFFLINE=0 \
+    NODE_ICU_DATA=/usr/share/node-22/icudata
 
 
 # Install pi (https://pi.dev/) globally via npm.
