@@ -1,4 +1,4 @@
-# OpenCode container TODO
+# Ollama container TODO
 
 ## TOP
 - [ ] Create non-root user in container instead of running as root

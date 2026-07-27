@@ -5,18 +5,19 @@
 {
   "providers": {
     "llamacpp": {
-      "baseURL": "http://127.0.0.1:7626/v1",
+      "baseUrl": "http://127.0.0.1:7626/v1",
+      "api": "openai-completions",
       "apiKey": "llama.cpp",
       "models": [
-        { "id": "Ornith-35B-BF16",              "name": "Ornith-35B-BF16" },            // Context: 262K, text only
-        { "id": "Ornith-35B",                   "name": "Ornith-35B" },                 // Context: 262K, text only
-        { "id": "Ornith-35B-UD-Q8_K_XL",        "name": "Ornith-35B-UD-Q8_K_XL" },      // Context: 262K, text only
-        { "id": "Qwen3.6-27B-DFlash-Q8_0",      "name": "Qwen3.6-27B-DFlash-Q8_0" },    // Context: 262K, text+image
-        { "id": "gemma-4-31B-it",               "name": "gemma-4-31B-it" },             // Context: 262K, text+image
-        { "id": "Gemma-26B",                    "name": "Gemma-26B" },                  // Context: 262K, text only
-        { "id": "Gemma-12B",                    "name": "Gemma-12B" },                  // Context: 262K, text only
-        { "id": "Gemma-E4B",                    "name": "Gemma-E4B" },                  // Context: 131K, text only
-        { "id": "Gemma-E2B",                    "name": "Gemma-E2B" }                   // Context: 131K, text only
+        { "id": "Ornith-35B-BF16", "name": "Ornith-35B-BF16", "reasoning": true },   // Context: 262K, text only
+        { "id": "Ornith-35B", "name": "Ornith-35B", "reasoning": true },             // Context: 262K, text only
+        { "id": "Ornith-35B-UD-Q8_K_XL", "name": "Ornith-35B-UD-Q8_K_XL", "reasoning": true }, // Context: 262K, text only
+        { "id": "Qwen3.6-27B-DFlash-Q8_0", "name": "Qwen3.6-27B-DFlash-Q8_0" },     // Context: 262K, text+image
+        { "id": "gemma-4-31B-it", "name": "gemma-4-31B-it" },                       // Context: 262K, text+image
+        { "id": "Gemma-26B", "name": "Gemma-26B" },                                 // Context: 262K, text only
+        { "id": "Gemma-12B", "name": "Gemma-12B" },                                 // Context: 262K, text only
+        { "id": "Gemma-E4B", "name": "Gemma-E4B" },                                 // Context: 131K, text only
+        { "id": "Gemma-E2B", "name": "Gemma-E2B" }                                  // Context: 131K, text only
       ]
     }
   }

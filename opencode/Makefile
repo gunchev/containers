@@ -83,8 +83,8 @@ lint:
 
 .PHONY: test
 test:
-	podman run --rm --security-opt label=disable --user podman --device /dev/fuse --userns=keep-id localhost/opencode:latest opencode --version
-	@podman run --rm --security-opt label=disable --user podman --device /dev/fuse --userns=keep-id localhost/opencode:latest podman info --format '{{.Host.Security.RootlessUIDMapping}}' && echo "rootless container stack reachable" \
+	$(CONTAINER_CMD) run --rm --security-opt label=disable --user podman --device /dev/fuse --userns=keep-id localhost/opencode:latest opencode --version
+	@$(CONTAINER_CMD) run --rm --security-opt label=disable --user podman --device /dev/fuse --userns=keep-id localhost/opencode:latest podman info --format '{{.Host.Security.RootlessUIDMapping}}' && echo "rootless container stack reachable" \
 		|| echo "Skipping nested podman check (requires newuidmap on host)"
 
 

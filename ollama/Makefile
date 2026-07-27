@@ -20,6 +20,9 @@ help:
 	@echo "Available targets:"
 	@echo "    all, image:   Create the container image."
 	@echo "    clean:        Clean all generated files and images."
+	@echo "    lint:         Run linters on project files."
+	@echo "    test:         Run ollama --version inside the container."
+	@echo "    toolbox:      Create toolbox"
 	@echo
 	@echo "Usage:"
 	@echo "    make image"
@@ -37,11 +40,53 @@ all: image
 
 .PHONY: image
 image:
-	"$(CONTAINER_CMD)" build --build-arg VERSION=$(VERSION) --platform linux/amd64 \
+	"$(CONTAINER_CMD)" build \
+            --build-arg VERSION=$(VERSION) \
+            --platform linux/amd64 \
             --tag localhost/$(IMAGE_NAME):$(VERSION) --tag localhost/$(IMAGE_NAME):latest .
 
 
 
 .PHONY: clean
 clean:
-	-"$(CONTAINER_CMD)" image rm "localhost/$(IMAGE_NAME):$(VERSION)" "localhost/$(IMAGE_NAME):latest"
+	-"$(CONTAINER_CMD)" image rm "$(IMAGE_NAME):$(VERSION)" 2>/dev/null || true
+	-"$(CONTAINER_CMD)" image rm "$(IMAGE_NAME):latest" 2>/dev/null || true
+
+
+
+.PHONY: prune
+prune:
+	@echo "Pruning dangling images…"
+	@"$(CONTAINER_CMD)" image prune -f
+	@echo "Pruning dangling/anonymous volumes…"
+	@"$(CONTAINER_CMD)" volume prune -f
+
+
+
+.PHONY: clean-all
+clean-all: clean prune
+	@echo "Toolbox container still present? Remove with: toolbox rm --force $(IMAGE_NAME)-toolbox"
+
+
+
+.PHONY: lint
+lint:
+	@echo "Running linters..."
+	@echo "Shell scripts:"
+	@shellcheck scripts/*
+	@echo "Containerfile:"
+	@hadolint Containerfile
+	@echo "Linting complete."
+
+
+
+.PHONY: test
+test:
+	podman run --rm --security-opt label=disable --device nvidia.com/gpu=all --user podman --userns=keep-id localhost/ollama:latest ollama --version
+
+
+
+.PHONY: toolbox
+toolbox:
+	toolbox create -c ollama-toolbox -i localhost/ollama:latest
+	echo "Use 'toolbox enter ollama-toolbox' to enter the toolbox"

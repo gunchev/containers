@@ -3,7 +3,7 @@
 A containerized setup for running [OpenCode](https://github.com/sst/opencode) using Podman or Docker.
 Both podman and docker should work (I use podman BTW).
 
-The container is based on [Fedora 43](https://www.fedoraproject.org/) because:
+The container is based on [Fedora 44](https://www.fedoraproject.org/) because:
 
 1. [Alpine](https://www.alpinelinux.org/) did not work (my fault?).
 2. ArchLinux AUR went down and I had no choice, so I don't use Arch BTW :-(
