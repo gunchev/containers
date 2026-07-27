@@ -1,0 +1,11 @@
+.git/
+.gitignore
+.editorconfig
+AGENTS.md
+TODO.md
+README.md
+LICENSE
+scripts/
+docs/
+config/
+*.html

@@ -73,7 +73,7 @@ RUN ARCH=$(uname -m) && \
 # OCI image labels so this image is identifiable in registries and `podman inspect`.
 # Overrides the upstream-fed `org.opencontainers.image.title=fedora`.
 LABEL org.opencontainers.image.title="opencode" \
-      org.opencontainers.image.description="OpenCode (sst/opencode) AI coding agent on Fedora 43 with full toolchain" \
+      org.opencontainers.image.description="OpenCode (sst/opencode) AI coding agent on Fedora 44 with full toolchain" \
       org.opencontainers.image.source="https://github.com/gunchev/containers/tree/master/opencode" \
       org.opencontainers.image.url="https://github.com/gunchev/containers/tree/master/opencode" \
       org.opencontainers.image.documentation="https://opencode.ai/" \

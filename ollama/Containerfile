@@ -22,7 +22,17 @@ RUN --mount=type=cache,dst=/var/cache/libdnf5/ --mount=type=tmpfs,dst=/var/log -
 
 RUN curl -fsSL https://github.com/ollama/ollama/releases/download/v${VERSION}/ollama-linux-amd64.tar.zst | tar --zstd -xv -C /usr/local
 
-# This is to support AMD ROCM, 5.6 GiB / 8.6 GiB. Disabling to save space.
-# RUN curl -fsSL https://ollama.com/download/ollama-linux-amd64-rocm.tgz | tar -xzv -C /usr/local
+# Create the in-container `podman` user so `make test` (and the helper
+# scripts' `--user podman`) can pass `--user podman` reliably.
+# Avoid UID 1000 because `toolbox init-container` will try to useradd the
+# host's first user (typically uid 1000) and fail with
+# "UID 1000 is not unique". UID 2000 is the next-sensible convention.
+RUN getent group podman >/dev/null || groupadd -g 2000 podman \
+    && useradd -m -d /home/podman -u 2000 -g podman -s /bin/bash podman \
+    && mkdir -p /run/user/2000 \
+    && chown -R podman:podman /run/user/2000 /usr/local/bin/ollama
 
-CMD /usr/local/bin/ollama serve
+USER podman
+WORKDIR /home/podman
+
+CMD ["/usr/local/bin/ollama", "serve"]

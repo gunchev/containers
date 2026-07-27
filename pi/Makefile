@@ -52,8 +52,8 @@ image:
 
 .PHONY: clean
 clean:
-	-"$(CONTAINER_CMD)" image rm "$(IMAGE_NAME):latest" 2>/dev/null || true
-	-"$(CONTAINER_CMD)" image rm "$(IMAGE_NAME):$(VERSION)" 2>/dev/null || true
+	-"$(CONTAINER_CMD)" image rm "localhost/$(IMAGE_NAME):latest" 2>/dev/null || true
+	-"$(CONTAINER_CMD)" image rm "localhost/$(IMAGE_NAME):$(VERSION)" 2>/dev/null || true
 
 
 .PHONY: prune

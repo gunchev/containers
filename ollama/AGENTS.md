@@ -8,15 +8,16 @@
 
 ## Testing & Linting
 - `./scripts/ollama_test_nvidia_gpu`: Runs `nvidia-smi -L` in the container to show accessible NVIDIA GPUs
-- `./scripts/ollama_serve`: Start ollama server for integration testing
+- `./scripts/ollama start`: Start ollama server for integration testing
 - `./scripts/ollama <args>`: Execute ollama commands in container for manual testing
+- `make test`: Run `ollama --version` inside the container as the `podman` user
 - No automated test suite; use scripts for manual testing
 
 ## Code Style Guidelines
 - **Shell scripts**: `#!/usr/bin/env bash`, `set -euo pipefail`, `shopt -s nullglob dotglob`
 - **Container detection**: `CONTAINER_CMD=$(if command -v podman >/dev/null 2>&1; then echo "podman"; else echo "docker"; fi)`
 - **Container flags**: `--network=host --device nvidia.com/gpu=all --security-opt=label=disable`
-- **Volume mounts**: `-v "${HOME}/.ollama:/root/.ollama"` for persistent storage
+- **Volume mounts**: `-v "${HOME}/.ollama:/home/podman/.ollama"` for persistent storage
 - **Naming**: Lowercase with underscores (e.g., `container_cmd`), UPPERCASE for constants
 - **Quotes**: Always quote variables: `"${VAR}"`, use arrays for multiple arguments
 - **Functions**: Use `local` for variables; avoid global scope pollution

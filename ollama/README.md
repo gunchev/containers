@@ -10,7 +10,7 @@ This project provides an easy way to run Ollama AI models in containers with NVI
 - 🎮 NVIDIA GPU support via container toolkit
 - 🛠️ Support for both Podman and Docker
 - 🔧 Automated container runtime detection
-- 📦 Pre-installed monitoring tools (nvtop, htop, ncdu, nnn, nmap-ncat)
+- 📦 Pre-installed monitoring tools (nvtop, htop, nnn, nmap-ncat)
 - 🏃‍♂️ Unified script interface for all operations
 
 
@@ -25,7 +25,7 @@ This project provides an easy way to run Ollama AI models in containers with NVI
 
 1. Clone this repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/gunchev/containers
    cd containers/ollama
    ```
 
@@ -112,7 +112,7 @@ This runs a quick test to verify NVIDIA GPU access in the container. Will print 
 
 - `make image` or `make all`: Build the container image
 - `make clean`: Remove generated images
-- `make image TAG=custom`: Build with custom tag
+- `make image VERSION=custom`: Build with custom version
 
 
 ### Scripts
@@ -138,7 +138,7 @@ The container is configured with:
 - Host networking (`--network=host`)
 - GPU device access (`--device nvidia.com/gpu=all`)
 - Security label disabled (`--security-opt=label=disable`)
-- Persistent storage mounted (`${HOME}/.ollama:/root/.ollama`)
+- Persistent storage mounted (`${HOME}/.ollama:/home/podman/.ollama`)
 
 
 ## Troubleshooting

@@ -1,6 +1,6 @@
 # OpenCode Container - Agent Guidelines
 
-This repository contains a Fedora 43-based container image with [OpenCode](https://github.com/sst/opencode) CLI tool pre-installed.
+This repository contains a Fedora 44-based container image with [OpenCode](https://github.com/sst/opencode) CLI tool pre-installed.
 
 ## Build/Lint/Test Commands
 

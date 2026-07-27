@@ -44,7 +44,7 @@ start_container() {
         --network=host \
         --device nvidia.com/gpu=all \
         --security-opt=label=disable \
-        -v "${HOME}/.ollama:/root/.ollama" \
+        -v "${HOME}/.ollama:/home/podman/.ollama" \
         --name "${CONTAINER_NAME}" \
         localhost/ollama:latest \
         /usr/local/bin/ollama serve
