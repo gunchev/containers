@@ -142,8 +142,25 @@ pi/
 │   └── models.jsonc     # Sample Pi models.json (llamacpp provider)
 ├── docs/                # Offline documentation printouts
 └── scripts/
-    └── pi               # Helper script to run the container
+    ├── pi               # Helper script to run the container
+    └── podman-host      # Wrapper for running containers on the host (GPU support)
 ```
+
+## Running GPU containers from inside the toolbox
+
+Nested podman (crun inside crun) does not work inside a Toolbx container.
+Use `scripts/podman-host` to run containers on the host via the podman API
+socket exposed at `/run/host/run/user/<UID>/podman/podman.sock`.
+
+```bash
+podman-host run --rm --network=host \
+    --device /dev/dri/renderD128:/dev/dri/renderD128 \
+    --device /dev/dri/card1:/dev/dri/card1 \
+    -v /srv/llama.cpp/data/models:/models:ro \
+    localhost/llama-vulkan-radv-f44-laguna llama-simple \
+    -m /models/gemma-4-E2B-it-UD-Q8_K_XL.gguf -ngl 35 -n 32 "Hello"
+```
+
 
 ## Container Configuration
 

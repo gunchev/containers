@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+#
+# podman-host — Run Podman commands against the HOST's container runtime
+# from inside a Toolbx/Podman container.
+#
+# Nested podman (crun inside crun) fails with "cannot set user namespace"
+# inside Toolbx containers. This wrapper bypasses that by connecting to
+# the host's podman API socket, which Toolbx exposes at:
+#   /run/host/run/user/<UID>/podman/podman.sock
+#
+# When not inside a Toolbx container (no /run/host mount), it falls back
+# to SSH to 127.1 (requires the host's podman.socket to be running).
+#
+# Usage:
+#   podman-host ps
+#   podman-host run --rm --device /dev/dri/... localhost/llama-vulkan-radv-f44-laguna ...
+#   podman-host images
+#
+# All arguments are passed through to `podman --remote`.
+
+set -euo pipefail
+
+HOST_UID="$(id -u)"
+
+# Strategy 1: Toolbx exposes the host filesystem at /run/host/
+TOOLBX_SOCKET="/run/host/run/user/${HOST_UID}/podman/podman.sock"
+if [ -S "${TOOLBX_SOCKET}" ]; then
+    exec podman --remote --url "unix://${TOOLBX_SOCKET}" "$@"
+fi
+
+# Strategy 2: SSH to localhost (127.1 is the conventional host alias)
+SSH_SOCKET="/run/user/${HOST_UID}/podman/podman.sock"
+if ssh -o BatchMode=yes -o ConnectTimeout=3 127.1 "test -S ${SSH_SOCKET}" 2>/dev/null; then
+    exec podman --remote --url "ssh://$(whoami)@127.1${SSH_SOCKET}" "$@"
+fi
+
+echo "Error: could not find host podman socket." >&2
+echo "Tried:" >&2
+echo "  1. ${TOOLBX_SOCKET} (Toolbx /run/host mount)" >&2
+echo "  2. ssh://$(whoami)@127.1${SSH_SOCKET} (SSH to host)" >&2
+echo "" >&2
+echo "Ensure the host's podman.socket is running:" >&2
+echo "  ssh 127.1 'systemctl --user start podman.socket'" >&2
+exit 1

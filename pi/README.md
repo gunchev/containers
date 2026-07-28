@@ -150,6 +150,49 @@ podman run --rm --env PI_OFFLINE= -e PI_SKIP_VERSION_CHECK= -e PI_TELEMETRY \
 ```
 
 
+## Running GPU containers from inside the toolbox
+
+Nested podman (crun inside crun) does not work inside a Toolbx container
+— it fails with `cannot set user namespace`. The `podman-host` helper script
+works around this by connecting to the **host's** podman API socket, which
+Toolbx exposes at `/run/host/run/user/<UID>/podman/podman.sock`.
+
+### Prerequisites on the host
+
+```bash
+# Ensure the podman API socket is running on the host
+systemctl --user start podman.socket
+```
+
+### Usage
+
+```bash
+# List containers on the host
+podman-host ps
+
+# Run a GPU container on the host (with host networking for port access)
+podman-host run --rm --network=host \
+    --device /dev/dri/renderD128:/dev/dri/renderD128 \
+    --device /dev/dri/card1:/dev/dri/card1 \
+    -v /srv/llama.cpp/data/models:/models:ro \
+    localhost/llama-vulkan-radv-f44-laguna llama-simple \
+    -m /models/gemma-4-E2B-it-UD-Q8_K_XL.gguf -ngl 35 -n 32 "Hello"
+
+# Start a llama-server and curl it from the toolbox
+podman-host run --rm --network=host \
+    --device /dev/dri/renderD128:/dev/dri/renderD128 \
+    -v /srv/llama.cpp/data/models:/models:ro \
+    localhost/llama-vulkan-radv-f44-laguna llama-server \
+    --model /models/gemma-4-E2B-it-UD-Q8_K_XL.gguf --n-gpu-layers 35 --port 8080
+curl -s http://127.0.0.1:8080/completion -X POST \
+    -H "Content-Type: application/json" \
+    -d '{"prompt":"Hello","n_predict":32}'
+```
+
+> **Note:** The script auto-detects the host socket via Toolbx's `/run/host/`
+> mount. If that's not available, it falls back to SSH to `127.1`.
+
+
 ## Resources
 
 - [Pi Documentation](https://pi.dev/)
