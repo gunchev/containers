@@ -5,7 +5,6 @@ AGENTS.md
 TODO.md
 README.md
 LICENSE
-scripts/
+scripts/pi
 docs/
-config/
 *.html

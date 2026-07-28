@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#
+# podman — Transparent wrapper that uses the HOST's podman API when inside
+# a Toolbx container, falling back to the local podman binary otherwise.
+#
+# Nested podman (crun inside crun) fails with "cannot set user namespace"
+# inside Toolbx containers. This wrapper detects the host's podman socket
+# (exposed by Toolbx at /run/host/run/user/<UID>/podman/podman.sock) and
+# routes commands through `podman --remote` to the host's container runtime.
+#
+# When the host socket is not available (e.g., running outside a Toolbx
+# container), it falls back to the real /usr/bin/podman.
+
+set -euo pipefail
+
+HOST_UID="$(id -u)"
+TOOLBX_SOCKET="/run/host/run/user/${HOST_UID}/podman/podman.sock"
+
+if [ -S "${TOOLBX_SOCKET}" ]; then
+    exec /usr/bin/podman --remote --url "unix://${TOOLBX_SOCKET}" "$@"
+else
+    exec /usr/bin/podman "$@"
+fi

@@ -86,6 +86,14 @@ COPY /config/settings.json /etc/skel/.pi/agent/settings.json
 COPY /config/pi-agent-setup.sh /etc/profile.d/pi-agent-setup.sh
 RUN chmod 0755 /etc/profile.d/pi-agent-setup.sh
 
+# Install podman-host and podman wrapper scripts so the pi agent can run
+# containers on the HOST from inside a Toolbx container (nested podman
+# fails with 'cannot set user namespace'). The podman wrapper transparently
+# delegates to `podman --remote` when the host socket is available.
+COPY /scripts/podman /usr/local/bin/podman
+COPY /scripts/podman-host /usr/local/bin/podman-host
+RUN chmod 0755 /usr/local/bin/podman /usr/local/bin/podman-host
+
 
 # Create the in-container `podman` user so `make test` (and the helper
 # scripts' `--userns=keep-id`) can pass `--user podman` reliably.

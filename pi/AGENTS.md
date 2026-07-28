@@ -143,7 +143,8 @@ pi/
 ├── docs/                # Offline documentation printouts
 └── scripts/
     ├── pi               # Helper script to run the container
-    └── podman-host      # Wrapper for running containers on the host (GPU support)
+    ├── podman           # Transparent wrapper: uses host podman via /run/host socket
+    └── podman-host      # Explicit wrapper for running containers on the host
 ```
 
 ## Running GPU containers from inside the toolbox

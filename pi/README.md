@@ -104,6 +104,7 @@ The container is configured with:
   - `$HOME/.local/share/containers` (nested container storage)
 - Network access via host networking
 - FUSE device support for nested containers
+- Transparent `podman` wrapper that delegates to host podman inside Toolbx
 
 
 ## Troubleshooting
@@ -153,9 +154,16 @@ podman run --rm --env PI_OFFLINE= -e PI_SKIP_VERSION_CHECK= -e PI_TELEMETRY \
 ## Running GPU containers from inside the toolbox
 
 Nested podman (crun inside crun) does not work inside a Toolbx container
-— it fails with `cannot set user namespace`. The `podman-host` helper script
-works around this by connecting to the **host's** podman API socket, which
-Toolbx exposes at `/run/host/run/user/<UID>/podman/podman.sock`.
+— it fails with `cannot set user namespace`. Two helpers solve this:
+
+- **`podman`** (wrapper) — transparently delegates to `podman --remote`
+  when the host's podman socket is detected at
+  `/run/host/run/user/<UID>/podman/podman.sock`. This means regular
+  `podman run ...` commands just work.
+- **`podman-host`** — explicit wrapper with the same logic plus SSH fallback
+  to `127.1`.
+
+Both are installed at `/usr/local/bin/` in the container image.
 
 ### Prerequisites on the host
 
@@ -189,8 +197,10 @@ curl -s http://127.0.0.1:8080/completion -X POST \
     -d '{"prompt":"Hello","n_predict":32}'
 ```
 
-> **Note:** The script auto-detects the host socket via Toolbx's `/run/host/`
-> mount. If that's not available, it falls back to SSH to `127.1`.
+> **Note:** Both scripts auto-detect the host socket via Toolbx's `/run/host/`
+> mount. If that's not available, `podman-host` falls back to SSH to `127.1`.
+> The `podman` wrapper does not have the SSH fallback — use `podman-host`
+> for that.
 
 
 ## Resources
